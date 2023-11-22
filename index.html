@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simple Chat</title>
+</head>
+<body>
+  <label>Username</label>
+  <input type="text" id="username">
+  <button onclick="setUsername()">Verify</button>
+  <br><br>
+  <label>Add Friends To Private Room</label>
+  <input type="text" id="friendsname">
+  <button onclick="AddFriends()">Add</button>
+  <br><hr><br>
+  <label>Messages</label>
+  <div id="messages"></div>
+  <input type="text" id="messageInput" />
+  <button onclick="sendMessage()">Send</button>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.1.2/socket.io.js"></script>
+  <script>
+    const socket = io('http://localhost:3000');
+
+    function setUsername() {
+      const username = document.getElementById('username').value;
+      socket.emit('setUsername', username);
+    }
+
+    function AddFriends() {
+      const addfriends = document.getElementById('friendsname').value;
+      socket.emit('AddFriends', addfriends);
+    }
+
+    socket.on('roomAssigned', (room) => {
+      console.log(`You are in room: ${room}`);
+    });
+
+    // Listen for the 'message' event
+    socket.on('message', (data) => {
+      const messagesDiv = document.getElementById('messages');
+    //   messagesDiv.innerHTML += `<div>${data.userId}:  ${data.message}</div>`;
+    messagesDiv.innerHTML += `<div>${data.userName}:  ${data.message}</div>`;
+    });
+
+    function sendMessage() {
+      const messageInput = document.getElementById('messageInput');
+      const friendsInput = document.getElementById('messageInput');
+      const message = messageInput.value;
+      const friend = friendsInput.value;
+      socket.emit('message',  message, friend );
+      messageInput.value = '';
+    }
+  </script>
+</body>
+</html>
